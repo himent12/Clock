@@ -3,6 +3,9 @@ setlocal EnableExtensions
 
 title Clock Suite Installer
 
+REM Always run from this script's directory (for double-click launches)
+cd /d "%~dp0"
+
 echo ==========================================
 echo         Clock Suite Installer
 echo ==========================================
@@ -12,11 +15,13 @@ where py >nul 2>nul
 if errorlevel 1 (
   echo [ERROR] Python launcher not found.
   echo Install Python 3 from https://www.python.org/downloads/ and try again.
+  pause
   exit /b 1
 )
 
 if not exist requirements.txt (
   echo [ERROR] requirements.txt not found. Run this from the project root.
+  pause
   exit /b 1
 )
 
@@ -25,6 +30,7 @@ if not exist .venv (
   py -3 -m venv .venv
   if errorlevel 1 (
     echo [ERROR] Failed to create .venv
+    pause
     exit /b 1
   )
 ) else (
@@ -35,6 +41,7 @@ echo [Step 2/4] Activating environment...
 call .venv\Scripts\activate.bat
 if errorlevel 1 (
   echo [ERROR] Could not activate virtual environment.
+  pause
   exit /b 1
 )
 
@@ -46,6 +53,7 @@ echo [Step 4/4] Installing requirements...
 python -m pip install -r requirements.txt
 if errorlevel 1 (
   echo [ERROR] Requirements install failed.
+  pause
   exit /b 1
 )
 
