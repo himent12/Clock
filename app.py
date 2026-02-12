@@ -1,3 +1,10 @@
+"""Backward-compatible launcher."""
+
+from clock_app.app import run
+
+
+if __name__ == "__main__":
+    run()
 """Simple-but-capable desktop clock app using Tkinter only."""
 
 from datetime import datetime, timezone
