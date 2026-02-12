@@ -1,97 +1,116 @@
-"""Clock tab UI inspired by modern split-pane clock suites."""
+"""Qt World Clock tab UI."""
 
 from __future__ import annotations
 
-import tkinter as tk
-from tkinter import ttk
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
+    QCheckBox,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 
-class ClockTab(ttk.Frame):
-    """Main clock page with settings sidebar + display panel."""
+class ClockTab(QWidget):
+    """World Clock split-pane tab."""
 
-    def __init__(self, master: tk.Misc) -> None:
-        super().__init__(master, padding=0)
+    def __init__(self) -> None:
+        super().__init__()
 
-        self.top_bar = ttk.Frame(self, style="Card.TFrame", padding=(16, 12))
-        self.top_bar.pack(fill=tk.X)
+        root = QVBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.setSpacing(0)
 
-        self.app_title = ttk.Label(
-            self.top_bar,
-            text="Aetherial Clock Suite",
-            style="Clock.AppTitle.TLabel",
-        )
-        self.app_title.pack(side=tk.LEFT)
+        top = QFrame()
+        top.setObjectName("TopBar")
+        top_layout = QHBoxLayout(top)
+        top_layout.setContentsMargins(16, 12, 16, 12)
 
-        self.icon_row = ttk.Frame(self.top_bar, style="Card.TFrame")
-        self.icon_row.pack(side=tk.RIGHT)
+        title = QLabel("Aetherial Clock Suite")
+        title.setObjectName("AppTitle")
+        top_layout.addWidget(title)
+        top_layout.addStretch()
 
-        ttk.Label(self.icon_row, text="⌕", style="Clock.Icon.TLabel").pack(side=tk.LEFT, padx=8)
-        ttk.Label(self.icon_row, text="⭳", style="Clock.Icon.TLabel").pack(side=tk.LEFT, padx=8)
-        ttk.Label(self.icon_row, text="☰", style="Clock.Icon.TLabel").pack(side=tk.LEFT, padx=8)
+        icons = QLabel("⌕   ⭳   ☰")
+        icons.setObjectName("TopIcons")
+        top_layout.addWidget(icons)
+        root.addWidget(top)
 
-        self.content = ttk.Frame(self, style="Card.TFrame")
-        self.content.pack(fill=tk.BOTH, expand=True)
+        content = QHBoxLayout()
+        content.setContentsMargins(0, 0, 0, 0)
+        content.setSpacing(0)
 
-        self.sidebar = ttk.Frame(self.content, style="Sidebar.TFrame", padding=(16, 16))
-        self.sidebar.pack(side=tk.LEFT, fill=tk.Y)
+        sidebar = QFrame()
+        sidebar.setObjectName("Sidebar")
+        side_layout = QVBoxLayout(sidebar)
+        side_layout.setContentsMargins(16, 16, 16, 16)
 
-        ttk.Label(
-            self.sidebar,
-            text="Settings",
-            style="Clock.SideTitle.TLabel",
-        ).pack(anchor="w", pady=(0, 12))
+        side_title = QLabel("Settings")
+        side_title.setObjectName("SideTitle")
+        side_layout.addWidget(side_title)
 
-        self.controls_row = ttk.Frame(self.sidebar, style="Sidebar.TFrame")
-        self.controls_row.pack(fill=tk.X)
+        self.use_24h = QCheckBox("24-hour format")
+        self.use_24h.setChecked(True)
+        self.show_seconds = QCheckBox("Show seconds")
+        self.show_seconds.setChecked(True)
+        self.use_utc = QCheckBox("UTC mode")
+        self.dark_mode = QCheckBox("Dark mode")
+        self.dark_mode.setChecked(True)
+        self.always_on_top = QCheckBox("Always on top")
 
-        self.side_actions = ttk.Frame(self.sidebar, style="Sidebar.TFrame")
-        self.side_actions.pack(fill=tk.X, pady=(18, 0))
+        for widget in [self.use_24h, self.show_seconds, self.use_utc, self.dark_mode, self.always_on_top]:
+            side_layout.addWidget(widget)
 
-        ttk.Separator(self.sidebar).pack(fill=tk.X, pady=12)
+        side_layout.addSpacing(12)
+        side_layout.addWidget(QLabel("⏻ Add City"))
+        side_layout.addWidget(QLabel("Time Zone Converter"))
+        self.alarm_btn = QPushButton("Alarm Settings")
+        self.alarm_btn.setObjectName("AccentButton")
+        side_layout.addWidget(self.alarm_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+        side_layout.addStretch()
 
-        self.dev_tools = ttk.Frame(self.sidebar, style="Sidebar.TFrame")
-        self.dev_tools.pack(fill=tk.X)
+        content.addWidget(sidebar, 1)
 
-        self.actions_row = ttk.Frame(self.dev_tools, style="Sidebar.TFrame")
-        self.actions_row.pack(fill=tk.X, pady=(8, 0))
+        panel = QFrame()
+        panel.setObjectName("MainPanel")
+        panel_layout = QVBoxLayout(panel)
+        panel_layout.setContentsMargins(26, 24, 26, 24)
 
-        self.main_panel = ttk.Frame(self.content, style="MainPanel.TFrame", padding=(26, 24))
-        self.main_panel.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.time_label = QLabel("--:--:--")
+        self.time_label.setObjectName("TimeLabel")
+        self.time_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.time_label.setFont(QFont("Segoe UI", 46, QFont.Weight.Bold))
 
-        self.time_label = ttk.Label(self.main_panel, text="--:--:--", style="Clock.Time.TLabel")
-        self.time_label.pack(anchor="center", pady=(24, 6))
+        self.date_label = QLabel("")
+        self.date_label.setObjectName("DateLabel")
+        self.date_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.date_label = ttk.Label(self.main_panel, text="", style="Clock.Date.TLabel")
-        self.date_label.pack(anchor="center", pady=(0, 20))
+        self.status_label = QLabel("Running")
+        self.status_label.setObjectName("StatusLabel")
 
-        self.wave = tk.Canvas(self.main_panel, height=90, width=320, highlightthickness=0, bd=0)
-        self.wave.pack(anchor="center")
+        self.pause_btn = QPushButton("Pause")
+        self.copy_btn = QPushButton("Copy time")
+        self.quit_btn = QPushButton("Quit")
 
-        self.status_label = ttk.Label(self.main_panel, text="Running", style="Clock.Status.TLabel")
-        self.status_label.pack(anchor="w", pady=(18, 0))
+        actions = QHBoxLayout()
+        actions.addWidget(self.pause_btn)
+        actions.addWidget(self.copy_btn)
+        actions.addStretch()
+        actions.addWidget(self.quit_btn)
 
-    def draw_wave(self, panel_bg: str, accent: str, baseline: str, dot: str) -> None:
-        """Redraw decorative wave to match current theme."""
-        self.wave.configure(bg=panel_bg)
-        self.wave.delete("all")
-        self.wave.create_line(20, 50, 300, 50, fill=baseline, width=1)
-        self.wave.create_line(
-            40,
-            50,
-            80,
-            62,
-            120,
-            20,
-            160,
-            62,
-            200,
-            30,
-            240,
-            58,
-            280,
-            40,
-            fill=accent,
-            smooth=True,
-            width=2,
-        )
-        self.wave.create_oval(157, 47, 163, 53, fill=dot, outline="")
+        panel_layout.addStretch()
+        panel_layout.addWidget(self.time_label)
+        panel_layout.addWidget(self.date_label)
+        panel_layout.addStretch()
+        panel_layout.addLayout(actions)
+        panel_layout.addWidget(self.status_label)
+
+        content.addWidget(panel, 2)
+
+        wrap = QWidget()
+        wrap.setLayout(content)
+        root.addWidget(wrap)

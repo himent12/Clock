@@ -1,48 +1,60 @@
-"""Stopwatch tab UI and behavior."""
+"""Qt stopwatch tab."""
 
 from __future__ import annotations
 
 import time
-import tkinter as tk
-from tkinter import ttk
+
+from PySide6.QtCore import QTimer, Qt
+from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QHBoxLayout, QLabel, QPushButton, QVBoxLayout, QWidget
 
 
-class StopwatchTab(ttk.Frame):
-    """Lightweight stopwatch implementation."""
+class StopwatchTab(QWidget):
+    """Stopwatch widget."""
 
-    def __init__(self, master: tk.Misc) -> None:
-        super().__init__(master, padding=14)
+    def __init__(self) -> None:
+        super().__init__()
         self._start_time = 0.0
         self._elapsed = 0.0
         self._running = False
 
-        self.display = ttk.Label(self, text="00:00.00", style="Clock.SecondaryTime.TLabel")
-        self.display.pack(anchor="center", pady=(12, 10))
+        layout = QVBoxLayout(self)
+        self.display = QLabel("00:00.00")
+        self.display.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.display.setFont(QFont("Consolas", 42, QFont.Weight.Bold))
+        layout.addStretch()
+        layout.addWidget(self.display)
 
-        row = ttk.Frame(self)
-        row.pack(anchor="center")
+        row = QHBoxLayout()
+        self.start_btn = QPushButton("Start")
+        self.start_btn.clicked.connect(self.toggle)
+        row.addWidget(self.start_btn)
 
-        self.start_btn = ttk.Button(row, text="Start", command=self.toggle)
-        self.start_btn.pack(side=tk.LEFT)
-        ttk.Button(row, text="Reset", command=self.reset).pack(side=tk.LEFT, padx=(8, 0))
+        reset_btn = QPushButton("Reset")
+        reset_btn.clicked.connect(self.reset)
+        row.addWidget(reset_btn)
+        layout.addLayout(row)
+        layout.addStretch()
 
-        self._tick()
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self._tick)
+        self.timer.start(30)
 
     def toggle(self) -> None:
         if self._running:
             self._elapsed += time.perf_counter() - self._start_time
             self._running = False
-            self.start_btn.configure(text="Start")
+            self.start_btn.setText("Start")
         else:
             self._start_time = time.perf_counter()
             self._running = True
-            self.start_btn.configure(text="Pause")
+            self.start_btn.setText("Pause")
 
     def reset(self) -> None:
         self._running = False
         self._elapsed = 0.0
-        self.start_btn.configure(text="Start")
-        self.display.configure(text="00:00.00")
+        self.start_btn.setText("Start")
+        self.display.setText("00:00.00")
 
     def _tick(self) -> None:
         total = self._elapsed
@@ -51,5 +63,4 @@ class StopwatchTab(ttk.Frame):
 
         minutes = int(total // 60)
         seconds = total % 60
-        self.display.configure(text=f"{minutes:02d}:{seconds:05.2f}")
-        self.after(30, self._tick)
+        self.display.setText(f"{minutes:02d}:{seconds:05.2f}")

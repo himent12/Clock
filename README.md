@@ -28,6 +28,12 @@ Use `remove.bat --all` to also clear pip cache.
 ./run.sh
 ```
 
+
+## Tech stack
+
+- Python + **PySide6 (Qt)** desktop UI
+- Multi-file architecture in `clock_app/`
+
 ## Features
 
 ### World Clock tab
@@ -73,10 +79,10 @@ Use `remove.bat --all` to also clear pip cache.
 ## Requirements
 
 - Python 3.10+
-- Tkinter (included in most Python desktop installs)
+- PySide6 (installed automatically by install scripts)
 
 ## If `run.bat` closes and nothing appears
 
 - Run `run.bat` again; it now keeps errors visible and writes details to `run-error.log`.
-- If you see a Tkinter error, re-run Python installer and make sure **tcl/tk and IDLE** is enabled.
+- If you see a PySide6/Qt error, run `install.bat` again to reinstall dependencies.
 - If setup fails, run `install.bat` first, then `run.bat`.
