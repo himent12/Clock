@@ -1,10 +1,11 @@
 # Clock (Desktop App)
 
-A simple download and run, but with more useful features.
+Simple to download and run, but advanced enough for daily desktop use.
 
 ## Requirements
 
-- Python 3 (no extra package installs)
+- Python 3
+- No extra installs
 
 ## Run
 
@@ -12,7 +13,7 @@ A simple download and run, but with more useful features.
 python3 app.py
 ```
 
-## What you get
+## Features
 
 - Live clock + date
 - 12/24 hour toggle
@@ -21,7 +22,14 @@ python3 app.py
 - Pause / Resume updates
 - Always-on-top mode
 - Copy current time button
+- Keyboard shortcuts:
+  - `Space` pause/resume
+  - `Ctrl+C` copy time
+  - `Ctrl+Q` quit
 
-## Keep it simple
+## Project structure
 
-Everything is in one file (`app.py`) and only uses Python's standard library.
+- `app.py` (single-file app)
+- `.gitignore`
+
+That’s it—simple setup, richer behavior.

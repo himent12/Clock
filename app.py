@@ -20,8 +20,10 @@ class ClockApp:
         self.use_utc = tk.BooleanVar(value=False)
         self.always_on_top = tk.BooleanVar(value=False)
         self.status_text = tk.StringVar(value="Running")
+        self._status_clear_job: int | None = None
 
         self._build_ui()
+        self._bind_shortcuts()
         self._tick()
 
     def _build_ui(self) -> None:
@@ -79,6 +81,11 @@ class ClockApp:
 
         ttk.Label(outer, textvariable=self.status_text).pack(anchor="w", pady=(8, 0))
 
+    def _bind_shortcuts(self) -> None:
+        self.root.bind("<space>", lambda _event: self._toggle_running())
+        self.root.bind("<Control-c>", lambda _event: self._copy_time())
+        self.root.bind("<Control-q>", lambda _event: self.root.destroy())
+
     def _current_datetime(self) -> datetime:
         if self.use_utc.get():
             return datetime.now(timezone.utc)
@@ -95,7 +102,7 @@ class ClockApp:
     def _toggle_running(self) -> None:
         self.running = not self.running
         self.run_button.configure(text="Pause" if self.running else "Resume")
-        self.status_text.set("Running" if self.running else "Paused")
+        self._set_status("Running" if self.running else "Paused")
         if self.running:
             self._refresh_now()
 
@@ -104,7 +111,18 @@ class ClockApp:
         text = now.strftime(self._time_format())
         self.root.clipboard_clear()
         self.root.clipboard_append(text)
-        self.status_text.set(f"Copied: {text}")
+        self._set_status(f"Copied: {text}", auto_clear_ms=2000)
+
+    def _set_status(self, text: str, auto_clear_ms: int | None = None) -> None:
+        self.status_text.set(text)
+        if self._status_clear_job:
+            self.root.after_cancel(self._status_clear_job)
+            self._status_clear_job = None
+        if auto_clear_ms is not None:
+            self._status_clear_job = self.root.after(
+                auto_clear_ms,
+                lambda: self.status_text.set("Running" if self.running else "Paused"),
+            )
 
     def _refresh_now(self) -> None:
         now = self._current_datetime()
