@@ -12,3 +12,4 @@ class AppState:
     show_seconds: bool = True
     use_utc: bool = False
     always_on_top: bool = False
+    dark_mode: bool = True

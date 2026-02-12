@@ -1,29 +1,55 @@
 @echo off
-setlocal
+setlocal EnableExtensions
 
-REM Simple installer for Clock Suite on Windows
+title Clock Suite Installer
+
+echo ==========================================
+echo         Clock Suite Installer
+echo ==========================================
+
+echo [Check] Looking for Python launcher...
 where py >nul 2>nul
-if %errorlevel% neq 0 (
-  echo Python launcher not found. Install Python 3 from https://www.python.org/downloads/
+if errorlevel 1 (
+  echo [ERROR] Python launcher not found.
+  echo Install Python 3 from https://www.python.org/downloads/ and try again.
+  exit /b 1
+)
+
+if not exist requirements.txt (
+  echo [ERROR] requirements.txt not found. Run this from the project root.
   exit /b 1
 )
 
 if not exist .venv (
-  echo [1/3] Creating virtual environment...
+  echo [Step 1/4] Creating virtual environment...
   py -3 -m venv .venv
-  if %errorlevel% neq 0 exit /b 1
+  if errorlevel 1 (
+    echo [ERROR] Failed to create .venv
+    exit /b 1
+  )
+) else (
+  echo [Step 1/4] Virtual environment already exists.
 )
 
-echo [2/3] Activating environment...
+echo [Step 2/4] Activating environment...
 call .venv\Scripts\activate.bat
-if %errorlevel% neq 0 exit /b 1
+if errorlevel 1 (
+  echo [ERROR] Could not activate virtual environment.
+  exit /b 1
+)
 
-echo [3/3] Upgrading pip and installing requirements...
-python -m pip install --upgrade pip >nul
+echo [Step 3/4] Upgrading pip...
+python -m pip install --upgrade pip
+if errorlevel 1 echo [WARN] pip upgrade failed. Continuing...
+
+echo [Step 4/4] Installing requirements...
 python -m pip install -r requirements.txt
-if %errorlevel% neq 0 exit /b 1
+if errorlevel 1 (
+  echo [ERROR] Requirements install failed.
+  exit /b 1
+)
 
 echo.
-echo Install complete.
+echo [OK] Install complete.
 echo Run the app with: run.bat
 exit /b 0

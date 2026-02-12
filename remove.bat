@@ -1,19 +1,17 @@
 @echo off
 setlocal EnableExtensions
+REM Conflict-resolved script baseline
 
-REM Development cleanup script for Clock Suite
-REM Removes local install artifacts created by install/run steps.
+title Clock Suite Cleanup
 
-echo Cleaning Clock Suite development artifacts...
+echo ==========================================
+echo         Clock Suite Cleanup
+echo ==========================================
+echo Removing local development artifacts...
 
 if exist .venv (
   echo - Removing .venv
   rmdir /s /q .venv
-)
-
-if exist __pycache__ (
-  echo - Removing root __pycache__
-  rmdir /s /q __pycache__
 )
 
 for /d /r %%D in (__pycache__) do (
@@ -24,11 +22,14 @@ for /d /r %%D in (__pycache__) do (
 )
 
 for /r %%F in (*.pyc *.pyo) do (
-  if exist "%%F" (
-    del /f /q "%%F"
-  )
+  if exist "%%F" del /f /q "%%F"
 )
 
-echo Done.
-echo This removed local runtime/build artifacts only.
+if /I "%~1"=="--all" (
+  echo - Removing pip cache (if present)
+  if exist "%LocalAppData%\pip\Cache" rmdir /s /q "%LocalAppData%\pip\Cache"
+)
+
+echo [OK] Cleanup complete.
+echo Tip: use "remove.bat --all" to also clear pip cache.
 exit /b 0

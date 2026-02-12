@@ -1,13 +1,17 @@
 # Clock Suite (Desktop)
 
-A polished desktop clock app with **Clock + Stopwatch + Timer** in a clean multi-file codebase.
+A polished desktop clock app with **World Clock + Stopwatch + Timer** and a modern split-pane design.
+
+## Status
+
+This branch was refreshed to provide one conflict-free, consistent version of all core files.
 
 ## Why this version
 
 - Better organization (separated modules and views)
-- Better UI (dark themed, tabbed layout)
+- Better UI inspired by premium clock suites
 - Better utility (clock controls + stopwatch + timer)
-- Still easy to install and run
+- Simple installer and cleanup scripts for Windows
 
 ## Quick install (Windows)
 
@@ -15,34 +19,23 @@ A polished desktop clock app with **Clock + Stopwatch + Timer** in a clean multi
 2. Double-click `install.bat`.
 3. Double-click `run.bat`.
 
-That’s it.
+For development cleanup/uninstall of local artifacts, run `remove.bat`.
+Use `remove.bat --all` to also clear pip cache.
 
 ## Quick run (Linux/macOS)
 
 ```bash
 ./run.sh
-# Clock (Desktop App)
-
-Simple to download and run, but advanced enough for daily desktop use.
-
-## Requirements
-
-- Python 3
-- No extra installs
-
-## Run
-
-```bash
-python3 app.py
 ```
 
 ## Features
 
-### Clock tab
-- Live time + date
-- 12/24 hour toggle
+### World Clock tab
+- Modern split layout with left settings panel and main time display
+- 24-hour format toggle
 - Show/hide seconds
-- Local/UTC switch
+- UTC mode
+- Dark mode toggle
 - Always-on-top
 - Pause/resume updates
 - Copy current time
@@ -65,10 +58,11 @@ python3 app.py
 ## Project structure
 
 - `main.py` - app entrypoint
-- `clock_app/app.py` - app composition and core orchestration
+- `app.py` - compatibility launcher
+- `clock_app/app.py` - app composition and orchestration
 - `clock_app/core/state.py` - app state model
 - `clock_app/utils/time_utils.py` - time formatting/helpers
-- `clock_app/views/clock_tab.py` - clock tab widgets
+- `clock_app/views/clock_tab.py` - world clock tab widgets
 - `clock_app/views/stopwatch_tab.py` - stopwatch tab
 - `clock_app/views/timer_tab.py` - timer tab
 - `install.bat` - Windows installer/bootstrap
@@ -80,21 +74,3 @@ python3 app.py
 
 - Python 3.10+
 - Tkinter (included in most Python desktop installs)
-- Live clock + date
-- 12/24 hour toggle
-- Seconds on/off toggle
-- Local time / UTC toggle
-- Pause / Resume updates
-- Always-on-top mode
-- Copy current time button
-- Keyboard shortcuts:
-  - `Space` pause/resume
-  - `Ctrl+C` copy time
-  - `Ctrl+Q` quit
-
-## Project structure
-
-- `app.py` (single-file app)
-- `.gitignore`
-
-That’s it—simple setup, richer behavior.

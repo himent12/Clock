@@ -17,44 +17,151 @@ class ClockApplication:
 
     def __init__(self, root: tk.Tk) -> None:
         self.root = root
+        self.style = ttk.Style(self.root)
         self.state = AppState()
         self._status_clear_job: int | None = None
 
         self._configure_root()
-        self._configure_styles()
         self._build_ui()
+        self._apply_theme()
         self._bind_shortcuts()
         self._tick_clock()
 
     def _configure_root(self) -> None:
         self.root.title("Clock Suite")
-        self.root.geometry("680x430")
-        self.root.minsize(620, 390)
+        self.root.geometry("900x640")
+        self.root.minsize(820, 560)
 
-    def _configure_styles(self) -> None:
-        style = ttk.Style(self.root)
-        if "clam" in style.theme_names():
-            style.theme_use("clam")
+    def _palette(self) -> dict[str, str]:
+        if self.state.dark_mode:
+            return {
+                "bg": "#10131a",
+                "card": "#171d27",
+                "sidebar": "#151b27",
+                "panel": "#151d2a",
+                "fg": "#ecf1ff",
+                "muted": "#b6c2de",
+                "dim": "#8a96af",
+                "accent": "#2b83ea",
+                "wave_line": "#1a385c",
+                "wave_dot": "#47b4ff",
+            }
+        return {
+            "bg": "#eceff5",
+            "card": "#f5f7fb",
+            "sidebar": "#f1f4fa",
+            "panel": "#ffffff",
+            "fg": "#1c2230",
+            "muted": "#4d5b76",
+            "dim": "#62708f",
+            "accent": "#2b83ea",
+            "wave_line": "#b8d4f8",
+            "wave_dot": "#2b83ea",
+        }
 
-        bg = "#10131a"
-        card = "#171d27"
-        fg = "#ebf0ff"
-        accent = "#8eb8ff"
+    def _apply_theme(self) -> None:
+        if "clam" in self.style.theme_names():
+            self.style.theme_use("clam")
 
-        self.root.configure(bg=bg)
+        p = self._palette()
+        self.root.configure(bg=p["bg"])
 
-        style.configure("TFrame", background=bg)
-        style.configure("TNotebook", background=bg, borderwidth=0)
-        style.configure("TNotebook.Tab", padding=(12, 6))
+        self.style.configure("TFrame", background=p["bg"])
+        self.style.configure("Card.TFrame", background=p["card"])
+        self.style.configure("Sidebar.TFrame", background=p["sidebar"])
+        self.style.configure("MainPanel.TFrame", background=p["panel"])
 
-        style.configure("Card.TFrame", background=card)
-        style.configure("Clock.Time.TLabel", background=card, foreground=fg, font=("Segoe UI", 52, "bold"))
-        style.configure("Clock.SecondaryTime.TLabel", background=card, foreground=accent, font=("Consolas", 42, "bold"))
-        style.configure("Clock.Date.TLabel", background=card, foreground="#b8c4de", font=("Segoe UI", 14))
-        style.configure("Clock.Status.TLabel", background=card, foreground="#9ba7bf", font=("Segoe UI", 10))
+        self.style.configure("TNotebook", background=p["bg"], borderwidth=0)
+        self.style.configure(
+            "TNotebook.Tab",
+            background=p["card"],
+            foreground=p["muted"],
+            padding=(22, 10),
+        )
+        self.style.map(
+            "TNotebook.Tab",
+            foreground=[("selected", p["fg"])],
+            background=[("selected", p["panel"])],
+        )
+
+        self.style.configure(
+            "TCheckbutton",
+            background=p["sidebar"],
+            foreground=p["muted"],
+            font=("Segoe UI", 12),
+        )
+        self.style.map(
+            "TCheckbutton",
+            foreground=[("selected", p["fg"]), ("active", p["fg"])],
+        )
+
+        self.style.configure("TButton", font=("Segoe UI", 11), padding=(10, 6))
+        self.style.configure(
+            "Accent.TButton",
+            font=("Segoe UI", 11, "bold"),
+            padding=(14, 8),
+            background=p["accent"],
+            foreground="#ffffff",
+        )
+
+        self.style.configure(
+            "Clock.AppTitle.TLabel",
+            background=p["card"],
+            foreground=p["fg"],
+            font=("Segoe UI", 19, "bold"),
+        )
+        self.style.configure(
+            "Clock.Icon.TLabel",
+            background=p["card"],
+            foreground=p["dim"],
+            font=("Segoe UI", 17),
+        )
+        self.style.configure(
+            "Clock.SideTitle.TLabel",
+            background=p["sidebar"],
+            foreground=p["fg"],
+            font=("Segoe UI", 14, "bold"),
+        )
+        self.style.configure(
+            "Clock.SideText.TLabel",
+            background=p["sidebar"],
+            foreground=p["muted"],
+            font=("Segoe UI", 12),
+        )
+        self.style.configure(
+            "Clock.Time.TLabel",
+            background=p["panel"],
+            foreground=p["fg"],
+            font=("Segoe UI", 62, "bold"),
+        )
+        self.style.configure(
+            "Clock.SecondaryTime.TLabel",
+            background=p["card"],
+            foreground=p["accent"],
+            font=("Consolas", 42, "bold"),
+        )
+        self.style.configure(
+            "Clock.Date.TLabel",
+            background=p["panel"],
+            foreground=p["muted"],
+            font=("Segoe UI", 16),
+        )
+        self.style.configure(
+            "Clock.Status.TLabel",
+            background=p["panel"],
+            foreground=p["dim"],
+            font=("Segoe UI", 10),
+        )
+
+        self.clock_tab.draw_wave(
+            panel_bg=p["panel"],
+            accent=p["accent"],
+            baseline=p["wave_line"],
+            dot=p["wave_dot"],
+        )
 
     def _build_ui(self) -> None:
-        container = ttk.Frame(self.root, padding=12)
+        container = ttk.Frame(self.root, padding=14)
         container.pack(fill=tk.BOTH, expand=True)
 
         notebook = ttk.Notebook(container)
@@ -62,7 +169,7 @@ class ClockApplication:
 
         self.clock_tab = ClockTab(notebook)
         self.clock_tab.configure(style="Card.TFrame")
-        notebook.add(self.clock_tab, text="Clock")
+        notebook.add(self.clock_tab, text="World Clock")
 
         self.stopwatch_tab = StopwatchTab(notebook)
         self.stopwatch_tab.configure(style="Card.TFrame")
@@ -76,17 +183,51 @@ class ClockApplication:
 
     def _build_clock_controls(self) -> None:
         c = self.clock_tab.controls_row
+        side = self.clock_tab.side_actions
         a = self.clock_tab.actions_row
 
         self.use_24h = tk.BooleanVar(value=self.state.use_24h)
         self.show_seconds = tk.BooleanVar(value=self.state.show_seconds)
         self.use_utc = tk.BooleanVar(value=self.state.use_utc)
         self.always_on_top = tk.BooleanVar(value=self.state.always_on_top)
+        self.dark_mode = tk.BooleanVar(value=self.state.dark_mode)
 
-        ttk.Checkbutton(c, text="24-hour", variable=self.use_24h, command=self._on_options_changed).pack(side=tk.LEFT, padx=(0, 8))
-        ttk.Checkbutton(c, text="Show seconds", variable=self.show_seconds, command=self._on_options_changed).pack(side=tk.LEFT, padx=(0, 8))
-        ttk.Checkbutton(c, text="UTC", variable=self.use_utc, command=self._on_options_changed).pack(side=tk.LEFT, padx=(0, 8))
-        ttk.Checkbutton(c, text="Always on top", variable=self.always_on_top, command=self._toggle_topmost).pack(side=tk.LEFT)
+        ttk.Checkbutton(
+            c,
+            text="24-hour format",
+            variable=self.use_24h,
+            command=self._on_options_changed,
+        ).pack(anchor="w", pady=4)
+        ttk.Checkbutton(
+            c,
+            text="Show seconds",
+            variable=self.show_seconds,
+            command=self._on_options_changed,
+        ).pack(anchor="w", pady=4)
+        ttk.Checkbutton(
+            c,
+            text="UTC mode",
+            variable=self.use_utc,
+            command=self._on_options_changed,
+        ).pack(anchor="w", pady=4)
+        ttk.Checkbutton(
+            c,
+            text="Dark mode",
+            variable=self.dark_mode,
+            command=self._toggle_dark_mode,
+        ).pack(anchor="w", pady=4)
+        ttk.Checkbutton(
+            c,
+            text="Always on top",
+            variable=self.always_on_top,
+            command=self._toggle_topmost,
+        ).pack(anchor="w", pady=4)
+
+        ttk.Label(side, text="⏻ Add City", style="Clock.SideText.TLabel").pack(anchor="w", pady=(2, 6))
+        ttk.Label(side, text="Time Zone Converter", style="Clock.SideText.TLabel").pack(
+            anchor="w", pady=(2, 12)
+        )
+        ttk.Button(side, text="Alarm Settings", style="Accent.TButton").pack(anchor="w")
 
         self.pause_btn = ttk.Button(a, text="Pause", command=self._toggle_running)
         self.pause_btn.pack(side=tk.LEFT)
@@ -113,6 +254,11 @@ class ClockApplication:
         self.state.use_24h = self.use_24h.get()
         self.state.show_seconds = self.show_seconds.get()
         self.state.use_utc = self.use_utc.get()
+        self._refresh_clock_labels()
+
+    def _toggle_dark_mode(self) -> None:
+        self.state.dark_mode = self.dark_mode.get()
+        self._apply_theme()
         self._refresh_clock_labels()
 
     def _toggle_topmost(self) -> None:
