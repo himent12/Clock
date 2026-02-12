@@ -1,6 +1,11 @@
-# Clock (Desktop Starter)
+# Clock (Desktop App)
 
-This repository now contains a first desktop implementation of a clock app using Python's built-in Tkinter GUI toolkit.
+Simple to download and run, but advanced enough for daily desktop use.
+
+## Requirements
+
+- Python 3
+- No extra installs
 
 ## Run
 
@@ -8,15 +13,23 @@ This repository now contains a first desktop implementation of a clock app using
 python3 app.py
 ```
 
-## Current features
+## Features
 
-- Live digital clock (`HH:MM:SS`)
-- Current date (`Weekday, Month Day, Year`)
-- Simple fixed-size desktop window
+- Live clock + date
+- 12/24 hour toggle
+- Seconds on/off toggle
+- Local time / UTC toggle
+- Pause / Resume updates
+- Always-on-top mode
+- Copy current time button
+- Keyboard shortcuts:
+  - `Space` pause/resume
+  - `Ctrl+C` copy time
+  - `Ctrl+Q` quit
 
-## Next suggested steps
+## Project structure
 
-- Add start/stop controls
-- Add 12h/24h toggle
-- Add theming preferences
-- Package as a standalone desktop app (PyInstaller)
+- `app.py` (single-file app)
+- `.gitignore`
+
+That’s it—simple setup, richer behavior.
