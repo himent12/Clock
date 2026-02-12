@@ -15,14 +15,25 @@ A polished desktop clock app with **Clock + Stopwatch + Timer** in a clean multi
 2. Double-click `install.bat`.
 3. Double-click `run.bat`.
 
-For development cleanup/uninstall of local artifacts, run `remove.bat`.
-
 That’s it.
 
 ## Quick run (Linux/macOS)
 
 ```bash
 ./run.sh
+# Clock (Desktop App)
+
+Simple to download and run, but advanced enough for daily desktop use.
+
+## Requirements
+
+- Python 3
+- No extra installs
+
+## Run
+
+```bash
+python3 app.py
 ```
 
 ## Features
@@ -69,3 +80,21 @@ That’s it.
 
 - Python 3.10+
 - Tkinter (included in most Python desktop installs)
+- Live clock + date
+- 12/24 hour toggle
+- Seconds on/off toggle
+- Local time / UTC toggle
+- Pause / Resume updates
+- Always-on-top mode
+- Copy current time button
+- Keyboard shortcuts:
+  - `Space` pause/resume
+  - `Ctrl+C` copy time
+  - `Ctrl+Q` quit
+
+## Project structure
+
+- `app.py` (single-file app)
+- `.gitignore`
+
+That’s it—simple setup, richer behavior.
