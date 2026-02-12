@@ -73,6 +73,7 @@ python3 app.py
 - `clock_app/views/timer_tab.py` - timer tab
 - `install.bat` - Windows installer/bootstrap
 - `run.bat` - Windows launcher
+- `remove.bat` - Windows cleanup/uninstall (dev artifacts)
 - `run.sh` - Linux/macOS launcher
 
 ## Requirements
