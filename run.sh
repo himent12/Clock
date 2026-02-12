@@ -6,6 +6,6 @@ if [[ ! -d .venv ]]; then
 fi
 
 source .venv/bin/activate
-python -m pip install --upgrade pip >/dev/null 2>&1 || true
-python -m pip install -r requirements.txt >/dev/null 2>&1 || true
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
 python main.py

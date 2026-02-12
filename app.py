@@ -1,4 +1,7 @@
-"""Backward-compatible launcher."""
+"""Backward-compatible launcher.
+
+Prefer running `main.py`; this file remains for compatibility.
+"""
 
 from clock_app.app import run
 

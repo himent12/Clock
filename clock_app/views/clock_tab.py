@@ -15,7 +15,11 @@ class ClockTab(ttk.Frame):
         self.top_bar = ttk.Frame(self, style="Card.TFrame", padding=(16, 12))
         self.top_bar.pack(fill=tk.X)
 
-        self.app_title = ttk.Label(self.top_bar, text="Aetherial Clock Suite", style="Clock.AppTitle.TLabel")
+        self.app_title = ttk.Label(
+            self.top_bar,
+            text="Aetherial Clock Suite",
+            style="Clock.AppTitle.TLabel",
+        )
         self.app_title.pack(side=tk.LEFT)
 
         self.icon_row = ttk.Frame(self.top_bar, style="Card.TFrame")
@@ -31,7 +35,11 @@ class ClockTab(ttk.Frame):
         self.sidebar = ttk.Frame(self.content, style="Sidebar.TFrame", padding=(16, 16))
         self.sidebar.pack(side=tk.LEFT, fill=tk.Y)
 
-        ttk.Label(self.sidebar, text="Settings", style="Clock.SideTitle.TLabel").pack(anchor="w", pady=(0, 12))
+        ttk.Label(
+            self.sidebar,
+            text="Settings",
+            style="Clock.SideTitle.TLabel",
+        ).pack(anchor="w", pady=(0, 12))
 
         self.controls_row = ttk.Frame(self.sidebar, style="Sidebar.TFrame")
         self.controls_row.pack(fill=tk.X)
@@ -56,21 +64,34 @@ class ClockTab(ttk.Frame):
         self.date_label = ttk.Label(self.main_panel, text="", style="Clock.Date.TLabel")
         self.date_label.pack(anchor="center", pady=(0, 20))
 
-        self.wave = tk.Canvas(
-            self.main_panel,
-            height=90,
-            width=320,
-            bg="#151d2a",
-            highlightthickness=0,
-            bd=0,
-        )
+        self.wave = tk.Canvas(self.main_panel, height=90, width=320, highlightthickness=0, bd=0)
         self.wave.pack(anchor="center")
-        self._draw_wave()
 
         self.status_label = ttk.Label(self.main_panel, text="Running", style="Clock.Status.TLabel")
         self.status_label.pack(anchor="w", pady=(18, 0))
 
-    def _draw_wave(self) -> None:
-        self.wave.create_line(20, 50, 300, 50, fill="#1a385c", width=1)
-        self.wave.create_line(40, 50, 80, 62, 120, 20, 160, 62, 200, 30, 240, 58, 280, 40, fill="#2b83ea", smooth=True, width=2)
-        self.wave.create_oval(157, 47, 163, 53, fill="#47b4ff", outline="")
+    def draw_wave(self, panel_bg: str, accent: str, baseline: str, dot: str) -> None:
+        """Redraw decorative wave to match current theme."""
+        self.wave.configure(bg=panel_bg)
+        self.wave.delete("all")
+        self.wave.create_line(20, 50, 300, 50, fill=baseline, width=1)
+        self.wave.create_line(
+            40,
+            50,
+            80,
+            62,
+            120,
+            20,
+            160,
+            62,
+            200,
+            30,
+            240,
+            58,
+            280,
+            40,
+            fill=accent,
+            smooth=True,
+            width=2,
+        )
+        self.wave.create_oval(157, 47, 163, 53, fill=dot, outline="")

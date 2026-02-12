@@ -22,8 +22,8 @@ class ClockApplication:
         self._status_clear_job: int | None = None
 
         self._configure_root()
-        self._apply_theme()
         self._build_ui()
+        self._apply_theme()
         self._bind_shortcuts()
         self._tick_clock()
 
@@ -43,6 +43,8 @@ class ClockApplication:
                 "muted": "#b6c2de",
                 "dim": "#8a96af",
                 "accent": "#2b83ea",
+                "wave_line": "#1a385c",
+                "wave_dot": "#47b4ff",
             }
         return {
             "bg": "#eceff5",
@@ -53,6 +55,8 @@ class ClockApplication:
             "muted": "#4d5b76",
             "dim": "#62708f",
             "accent": "#2b83ea",
+            "wave_line": "#b8d4f8",
+            "wave_dot": "#2b83ea",
         }
 
     def _apply_theme(self) -> None:
@@ -68,22 +72,93 @@ class ClockApplication:
         self.style.configure("MainPanel.TFrame", background=p["panel"])
 
         self.style.configure("TNotebook", background=p["bg"], borderwidth=0)
-        self.style.configure("TNotebook.Tab", background=p["card"], foreground=p["muted"], padding=(22, 10))
-        self.style.map("TNotebook.Tab", foreground=[("selected", p["fg"])], background=[("selected", p["panel"])])
+        self.style.configure(
+            "TNotebook.Tab",
+            background=p["card"],
+            foreground=p["muted"],
+            padding=(22, 10),
+        )
+        self.style.map(
+            "TNotebook.Tab",
+            foreground=[("selected", p["fg"])],
+            background=[("selected", p["panel"])],
+        )
 
-        self.style.configure("TCheckbutton", background=p["sidebar"], foreground=p["muted"], font=("Segoe UI", 12))
-        self.style.map("TCheckbutton", foreground=[("selected", p["fg"]), ("active", p["fg"])])
+        self.style.configure(
+            "TCheckbutton",
+            background=p["sidebar"],
+            foreground=p["muted"],
+            font=("Segoe UI", 12),
+        )
+        self.style.map(
+            "TCheckbutton",
+            foreground=[("selected", p["fg"]), ("active", p["fg"])],
+        )
 
         self.style.configure("TButton", font=("Segoe UI", 11), padding=(10, 6))
-        self.style.configure("Accent.TButton", font=("Segoe UI", 11, "bold"), padding=(14, 8), background=p["accent"], foreground="#ffffff")
+        self.style.configure(
+            "Accent.TButton",
+            font=("Segoe UI", 11, "bold"),
+            padding=(14, 8),
+            background=p["accent"],
+            foreground="#ffffff",
+        )
 
-        self.style.configure("Clock.AppTitle.TLabel", background=p["card"], foreground=p["fg"], font=("Segoe UI", 19, "bold"))
-        self.style.configure("Clock.Icon.TLabel", background=p["card"], foreground=p["dim"], font=("Segoe UI", 17))
-        self.style.configure("Clock.SideTitle.TLabel", background=p["sidebar"], foreground=p["fg"], font=("Segoe UI", 14, "bold"))
-        self.style.configure("Clock.Time.TLabel", background=p["panel"], foreground=p["fg"], font=("Segoe UI", 62, "bold"))
-        self.style.configure("Clock.SecondaryTime.TLabel", background=p["card"], foreground=p["accent"], font=("Consolas", 42, "bold"))
-        self.style.configure("Clock.Date.TLabel", background=p["panel"], foreground=p["muted"], font=("Segoe UI", 16))
-        self.style.configure("Clock.Status.TLabel", background=p["panel"], foreground=p["dim"], font=("Segoe UI", 10))
+        self.style.configure(
+            "Clock.AppTitle.TLabel",
+            background=p["card"],
+            foreground=p["fg"],
+            font=("Segoe UI", 19, "bold"),
+        )
+        self.style.configure(
+            "Clock.Icon.TLabel",
+            background=p["card"],
+            foreground=p["dim"],
+            font=("Segoe UI", 17),
+        )
+        self.style.configure(
+            "Clock.SideTitle.TLabel",
+            background=p["sidebar"],
+            foreground=p["fg"],
+            font=("Segoe UI", 14, "bold"),
+        )
+        self.style.configure(
+            "Clock.SideText.TLabel",
+            background=p["sidebar"],
+            foreground=p["muted"],
+            font=("Segoe UI", 12),
+        )
+        self.style.configure(
+            "Clock.Time.TLabel",
+            background=p["panel"],
+            foreground=p["fg"],
+            font=("Segoe UI", 62, "bold"),
+        )
+        self.style.configure(
+            "Clock.SecondaryTime.TLabel",
+            background=p["card"],
+            foreground=p["accent"],
+            font=("Consolas", 42, "bold"),
+        )
+        self.style.configure(
+            "Clock.Date.TLabel",
+            background=p["panel"],
+            foreground=p["muted"],
+            font=("Segoe UI", 16),
+        )
+        self.style.configure(
+            "Clock.Status.TLabel",
+            background=p["panel"],
+            foreground=p["dim"],
+            font=("Segoe UI", 10),
+        )
+
+        self.clock_tab.draw_wave(
+            panel_bg=p["panel"],
+            accent=p["accent"],
+            baseline=p["wave_line"],
+            dot=p["wave_dot"],
+        )
 
     def _build_ui(self) -> None:
         container = ttk.Frame(self.root, padding=14)
@@ -117,14 +192,41 @@ class ClockApplication:
         self.always_on_top = tk.BooleanVar(value=self.state.always_on_top)
         self.dark_mode = tk.BooleanVar(value=self.state.dark_mode)
 
-        ttk.Checkbutton(c, text="24-hour format", variable=self.use_24h, command=self._on_options_changed).pack(anchor="w", pady=4)
-        ttk.Checkbutton(c, text="Show seconds", variable=self.show_seconds, command=self._on_options_changed).pack(anchor="w", pady=4)
-        ttk.Checkbutton(c, text="UTC mode", variable=self.use_utc, command=self._on_options_changed).pack(anchor="w", pady=4)
-        ttk.Checkbutton(c, text="Dark mode", variable=self.dark_mode, command=self._toggle_dark_mode).pack(anchor="w", pady=4)
-        ttk.Checkbutton(c, text="Always on top", variable=self.always_on_top, command=self._toggle_topmost).pack(anchor="w", pady=4)
+        ttk.Checkbutton(
+            c,
+            text="24-hour format",
+            variable=self.use_24h,
+            command=self._on_options_changed,
+        ).pack(anchor="w", pady=4)
+        ttk.Checkbutton(
+            c,
+            text="Show seconds",
+            variable=self.show_seconds,
+            command=self._on_options_changed,
+        ).pack(anchor="w", pady=4)
+        ttk.Checkbutton(
+            c,
+            text="UTC mode",
+            variable=self.use_utc,
+            command=self._on_options_changed,
+        ).pack(anchor="w", pady=4)
+        ttk.Checkbutton(
+            c,
+            text="Dark mode",
+            variable=self.dark_mode,
+            command=self._toggle_dark_mode,
+        ).pack(anchor="w", pady=4)
+        ttk.Checkbutton(
+            c,
+            text="Always on top",
+            variable=self.always_on_top,
+            command=self._toggle_topmost,
+        ).pack(anchor="w", pady=4)
 
-        ttk.Label(side, text="⏻ Add City", style="Clock.Date.TLabel").pack(anchor="w", pady=(2, 6))
-        ttk.Label(side, text="Time Zone Converter", style="Clock.Date.TLabel").pack(anchor="w", pady=(2, 12))
+        ttk.Label(side, text="⏻ Add City", style="Clock.SideText.TLabel").pack(anchor="w", pady=(2, 6))
+        ttk.Label(side, text="Time Zone Converter", style="Clock.SideText.TLabel").pack(
+            anchor="w", pady=(2, 12)
+        )
         ttk.Button(side, text="Alarm Settings", style="Accent.TButton").pack(anchor="w")
 
         self.pause_btn = ttk.Button(a, text="Pause", command=self._toggle_running)
@@ -179,7 +281,9 @@ class ClockApplication:
 
     def _refresh_clock_labels(self) -> None:
         now = current_datetime(self.state.use_utc)
-        self.clock_tab.time_label.configure(text=format_clock_text(now, self.state.use_24h, self.state.show_seconds))
+        self.clock_tab.time_label.configure(
+            text=format_clock_text(now, self.state.use_24h, self.state.show_seconds)
+        )
         self.clock_tab.date_label.configure(text=format_date_text(now, self.state.use_utc))
 
     def _tick_clock(self) -> None:

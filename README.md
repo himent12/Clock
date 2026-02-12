@@ -2,6 +2,10 @@
 
 A polished desktop clock app with **World Clock + Stopwatch + Timer** and a modern split-pane design.
 
+## Status
+
+This branch was refreshed to provide one conflict-free, consistent version of all core files.
+
 ## Why this version
 
 - Better organization (separated modules and views)
@@ -17,8 +21,6 @@ A polished desktop clock app with **World Clock + Stopwatch + Timer** and a mode
 
 For development cleanup/uninstall of local artifacts, run `remove.bat`.
 Use `remove.bat --all` to also clear pip cache.
-
-That’s it.
 
 ## Quick run (Linux/macOS)
 
@@ -56,6 +58,7 @@ That’s it.
 ## Project structure
 
 - `main.py` - app entrypoint
+- `app.py` - compatibility launcher
 - `clock_app/app.py` - app composition and orchestration
 - `clock_app/core/state.py` - app state model
 - `clock_app/utils/time_utils.py` - time formatting/helpers

@@ -1,5 +1,6 @@
 @echo off
 setlocal EnableExtensions
+REM Conflict-resolved script baseline
 
 title Clock Suite Launcher
 
