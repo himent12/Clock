@@ -24,14 +24,16 @@ class ClockWindow(QMainWindow):
         self._status_timer.timeout.connect(self._reset_status)
 
         self.setWindowTitle("Clock Suite")
-        self.resize(980, 680)
-        self.setMinimumSize(860, 560)
+        self.resize(1024, 700)
+        self.setMinimumSize(900, 620)
 
         root = QWidget()
         self.setCentralWidget(root)
         layout = QVBoxLayout(root)
+        layout.setContentsMargins(12, 12, 12, 12)
 
         self.tabs = QTabWidget()
+        self.tabs.setDocumentMode(True)
         layout.addWidget(self.tabs)
 
         self.clock_tab = ClockTab()
@@ -45,6 +47,7 @@ class ClockWindow(QMainWindow):
         self._bind_controls()
         self._bind_shortcuts()
         self._apply_theme()
+        self._refresh_clock_labels()
 
         self.clock_timer = QTimer(self)
         self.clock_timer.timeout.connect(self._tick_clock)
@@ -53,47 +56,64 @@ class ClockWindow(QMainWindow):
     def _palette(self) -> dict[str, str]:
         if self.state.dark_mode:
             return {
-                "bg": "#10131a",
-                "card": "#171d27",
-                "panel": "#151d2a",
-                "side": "#151b27",
-                "fg": "#ecf1ff",
-                "muted": "#aab5cd",
-                "accent": "#2b83ea",
+                "bg": "#0f1420",
+                "card": "#171f2f",
+                "panel": "#141c2b",
+                "side": "#121a29",
+                "fg": "#edf2ff",
+                "muted": "#9ca9c7",
+                "accent": "#3291ff",
+                "border": "#23314a",
             }
         return {
-            "bg": "#ecf0f8",
-            "card": "#f4f7ff",
+            "bg": "#edf1f8",
+            "card": "#f7f9fe",
             "panel": "#ffffff",
-            "side": "#edf2fb",
-            "fg": "#1e2b43",
-            "muted": "#5b6c8f",
+            "side": "#f0f4fb",
+            "fg": "#1d2b44",
+            "muted": "#5b6d90",
             "accent": "#2b83ea",
+            "border": "#c5d3ea",
         }
 
     def _style_sheet(self) -> str:
         p = self._palette()
         return f"""
         QMainWindow, QWidget {{ background: {p['bg']}; color: {p['fg']}; }}
-        QTabWidget::pane {{ border: 0; }}
-        QTabBar::tab {{ background: {p['card']}; color: {p['muted']}; padding: 10px 18px; border-top-left-radius: 8px; border-top-right-radius: 8px; }}
+        QTabWidget::pane {{ border: 1px solid {p['border']}; border-radius: 12px; top: -1px; }}
+        QTabBar::tab {{ background: {p['card']}; color: {p['muted']}; padding: 10px 18px; border-top-left-radius: 8px; border-top-right-radius: 8px; border: 1px solid {p['border']}; margin-right: 4px; }}
         QTabBar::tab:selected {{ color: {p['fg']}; background: {p['panel']}; }}
 
-        #TopBar {{ background: {p['card']}; border-top-left-radius: 12px; border-top-right-radius: 12px; }}
-        #Sidebar {{ background: {p['side']}; min-width: 260px; }}
+        #TopBar {{ background: {p['card']}; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom: 1px solid {p['border']}; }}
+        #Sidebar {{ background: {p['side']}; min-width: 290px; border-right: 1px solid {p['border']}; }}
         #MainPanel {{ background: {p['panel']}; }}
-        #AppTitle {{ font-size: 28px; font-weight: 700; }}
+
+        #AppTitle {{ font-size: 29px; font-weight: 700; }}
+        #TopSubTitle {{ color: {p['muted']}; font-size: 13px; }}
         #TopIcons {{ color: {p['muted']}; font-size: 20px; }}
         #SideTitle {{ font-size: 20px; font-weight: 600; }}
+        #SideTitleSmall {{ font-size: 14px; font-weight: 600; color: {p['muted']}; }}
+        #SideHelp {{ color: {p['muted']}; line-height: 1.4; }}
+        #SideLink {{ color: {p['muted']}; font-size: 14px; }}
+        #SideDivider {{ background: {p['border']}; }}
 
-        #TimeLabel {{ font-size: 84px; font-weight: 700; }}
+        #TimeLabel {{ font-size: 88px; font-weight: 700; letter-spacing: 1px; }}
         #DateLabel {{ font-size: 24px; color: {p['muted']}; }}
+        #WaveHint {{ color: {p['accent']}; font-size: 20px; }}
         #StatusLabel {{ color: {p['muted']}; }}
 
-        QPushButton {{ padding: 8px 14px; border-radius: 8px; border: 1px solid {p['muted']}; background: {p['card']}; }}
+        QPushButton {{
+            padding: 9px 14px;
+            border-radius: 9px;
+            border: 1px solid {p['border']};
+            background: {p['card']};
+            min-width: 88px;
+        }}
         QPushButton:hover {{ border-color: {p['accent']}; }}
-        #AccentButton {{ background: {p['accent']}; color: white; border: none; font-weight: 600; }}
-        QCheckBox {{ spacing: 8px; padding: 3px 0; }}
+        QPushButton:pressed {{ background: {p['side']}; }}
+        #AccentButton {{ background: {p['accent']}; color: white; border: none; font-weight: 600; min-width: 130px; }}
+        QCheckBox {{ spacing: 8px; padding: 4px 0; font-size: 14px; }}
+        QLineEdit {{ padding: 7px; border: 1px solid {p['border']}; border-radius: 7px; background: {p['panel']}; }}
         """
 
     def _bind_controls(self) -> None:
@@ -138,9 +158,7 @@ class ClockWindow(QMainWindow):
 
     def _copy_time(self) -> None:
         now = QDateTime.currentDateTimeUtc() if self.state.use_utc else QDateTime.currentDateTime()
-        text = format_clock_text(
-            now.toPython(), self.state.use_24h, self.state.show_seconds
-        )
+        text = format_clock_text(now.toPython(), self.state.use_24h, self.state.show_seconds)
         QApplication.clipboard().setText(text)
         self._set_status(f"Copied: {text}", 1800)
 
